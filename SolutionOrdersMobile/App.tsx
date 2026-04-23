@@ -1,28 +1,37 @@
-import React from 'react';
-import { View, StatusBar, useColorScheme, StyleSheet } from 'react-native';
-import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
-import { ItemsProvider } from './src/context/ItemsContext';
-import RootNavigator from './src/navigation/RootNavigator';
+/**
+ * Sample React Native App
+ * https://github.com/facebook/react-native
+ *
+ * @format
+ */
 
-function App(): React.JSX.Element {
+import { NewAppScreen } from '@react-native/new-app-screen';
+import { StatusBar, StyleSheet, useColorScheme, View } from 'react-native';
+import {
+  SafeAreaProvider,
+  useSafeAreaInsets,
+} from 'react-native-safe-area-context';
+
+function App() {
   const isDarkMode = useColorScheme() === 'dark';
 
   return (
     <SafeAreaProvider>
       <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-      <ItemsProvider>
-        <AppContent />
-      </ItemsProvider>
+      <AppContent />
     </SafeAreaProvider>
   );
 }
 
-function AppContent(): React.JSX.Element {
-  const insets = useSafeAreaInsets();
+function AppContent() {
+  const safeAreaInsets = useSafeAreaInsets();
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top }]}>
-      <RootNavigator />
+    <View style={styles.container}>
+      <NewAppScreen
+        templateFileName="App.tsx"
+        safeAreaInsets={safeAreaInsets}
+      />
     </View>
   );
 }
