@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import AppLayout from '../components/AppLayout';
 import type { ModuleName } from '../../App';
+
+const API_URL = 'http://10.0.2.2:5000/api';
 
 type Props = {
   onOpenModule: (moduleName: ModuleName) => void;
@@ -20,27 +22,70 @@ const modules: { title: string; subtitle: string; name: ModuleName }[] = [
 ];
 
 export default function HomeScreen({ onOpenModule, onLogout }: Props) {
+  const [dostepne, setDostepne] = useState(0);
+  const [wypozyczone, setWypozyczone] = useState(0);
+  const [serwis, setSerwis] = useState(0);
+  const [klienci, setKlienci] = useState(0);
+
+  const loadStats = async () => {
+    try {
+      const [roweryRes, klienciRes, serwisRes] = await Promise.all([
+        fetch(`${API_URL}/Rowery`),
+        fetch(`${API_URL}/Klienci`),
+        fetch(`${API_URL}/Serwisy`),
+      ]);
+
+      const rowery = await roweryRes.json();
+      const klienciData = await klienciRes.json();
+      const serwisyData = await serwisRes.json();
+
+      setDostepne(
+        rowery.filter((r: any) => String(r.status).toLowerCase().includes('dostęp')).length
+      );
+
+      setWypozyczone(
+        rowery.filter((r: any) => String(r.status).toLowerCase().includes('wypożycz')).length
+      );
+
+      setSerwis(
+        rowery.filter((r: any) =>
+        String(r.status).trim().toLowerCase() === 'serwis'
+        ).length
+      );
+      setKlienci(klienciData.length);
+    } catch {
+      setDostepne(0);
+      setWypozyczone(0);
+      setSerwis(0);
+      setKlienci(0);
+    }
+  };
+
+  useEffect(() => {
+    loadStats();
+  }, []);
+
   return (
     <AppLayout>
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.statsGrid}>
           <View style={styles.card}>
-            <Text style={styles.cardNumber}>8</Text>
+            <Text style={styles.cardNumber}>{dostepne}</Text>
             <Text style={styles.cardLabel}>Dostępne</Text>
           </View>
 
           <View style={styles.card}>
-            <Text style={styles.cardNumber}>4</Text>
+            <Text style={styles.cardNumber}>{wypozyczone}</Text>
             <Text style={styles.cardLabel}>Wypożyczone</Text>
           </View>
 
           <View style={styles.card}>
-            <Text style={styles.cardNumber}>1</Text>
+            <Text style={styles.cardNumber}>{serwis}</Text>
             <Text style={styles.cardLabel}>Serwis</Text>
           </View>
 
           <View style={styles.card}>
-            <Text style={styles.cardNumber}>24</Text>
+            <Text style={styles.cardNumber}>{klienci}</Text>
             <Text style={styles.cardLabel}>Klienci</Text>
           </View>
         </View>
@@ -78,29 +123,25 @@ const styles = StyleSheet.create({
     marginBottom: 22,
   },
   card: {
-  width: '47.8%',
-  backgroundColor: '#1E293B',
-  borderRadius: 20,
-  paddingVertical: 24,
-  alignItems: 'center',
-
-  borderWidth: 1.5,
-  borderColor: '#E5A24A', // 👈 złoto
-
-  elevation: 3,
-},
-
-cardNumber: {
-  fontSize: 40,
-  fontWeight: 'bold',
-  color: '#E5A24A',
-},
-
-cardLabel: {
-  fontSize: 14,
-  marginTop: 8,
-  color: '#CBD5E1',
-},
+    width: '47.8%',
+    backgroundColor: '#1E293B',
+    borderRadius: 20,
+    paddingVertical: 24,
+    alignItems: 'center',
+    borderWidth: 1.5,
+    borderColor: '#E5A24A',
+    elevation: 3,
+  },
+  cardNumber: {
+    fontSize: 40,
+    fontWeight: 'bold',
+    color: '#E5A24A',
+  },
+  cardLabel: {
+    fontSize: 14,
+    marginTop: 8,
+    color: '#CBD5E1',
+  },
   modulesList: {
     gap: 12,
   },

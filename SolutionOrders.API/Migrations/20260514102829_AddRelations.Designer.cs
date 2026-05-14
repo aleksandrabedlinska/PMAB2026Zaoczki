@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SolutionOrders.API.Data;
 
@@ -11,9 +12,11 @@ using SolutionOrders.API.Data;
 namespace SolutionOrders.API.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260514102829_AddRelations")]
+    partial class AddRelations
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -222,16 +225,15 @@ namespace SolutionOrders.API.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("RowerId")
-                        .HasColumnType("int");
+                    b.Property<string>("Rower")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("RowerId");
 
                     b.ToTable("Serwisy");
                 });
@@ -311,17 +313,6 @@ namespace SolutionOrders.API.Migrations
                     b.Navigation("Rower");
 
                     b.Navigation("Wypozyczenie");
-                });
-
-            modelBuilder.Entity("SolutionOrders.API.Models.Serwis", b =>
-                {
-                    b.HasOne("SolutionOrders.API.Models.Rower", "Rower")
-                        .WithMany()
-                        .HasForeignKey("RowerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Rower");
                 });
 
             modelBuilder.Entity("SolutionOrders.API.Models.Wypozyczenie", b =>
